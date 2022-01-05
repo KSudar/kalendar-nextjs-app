@@ -1,25 +1,16 @@
-import { TApointment } from '@types';
+import { TApointment, TDay } from '@types';
 
 const CalendarDay = ({
 	takenAppointments,
+	day,
 }: {
 	takenAppointments?: TApointment[];
+	day: TDay;
 }) => {
 	const availableApointments = [];
 	return (
 		<>
-			<div>8:00</div>
-			<div>8:30</div>
-			<div>9:00</div>
-			<div>9:30</div>
-			<div>10:00</div>
-			<div>10:30</div>
-			<div>11:00</div>
-			<div>11:30</div>
-			<div>12:00</div>
-			<div>12:30</div>
-			<div>13:00</div>
-			<div>13:30</div>
+			<h2>CALENDAR DAY</h2>
 		</>
 	);
 };

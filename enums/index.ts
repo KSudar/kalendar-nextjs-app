@@ -7,4 +7,9 @@ enum DaysOfTheWeek {
 	'Friday',
 	'Saturday',
 }
-export { DaysOfTheWeek };
+enum WorkingShift {
+	Morning,
+	Afternoon,
+	Closed,
+}
+export { DaysOfTheWeek, WorkingShift };

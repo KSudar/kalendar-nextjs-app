@@ -1,32 +1,37 @@
-import { WorkingShift } from 'enums';
+import { WorkingShift } from "enums";
+import CalendarBox from "@components/CalendarBox";
+import dayjs from "dayjs";
 
 const WorkingHours = () => {
-	return (
-		<>
-			<div>8:00</div>
-			<div>8:30</div>
-			<div>9:00</div>
-			<div>9:30</div>
-			<div>10:00</div>
-			<div>10:30</div>
-			<div>11:00</div>
-			<div>11:30</div>
-			<div>12:00</div>
-			<div>12:30</div>
-			<div>13:00</div>
-			<div>13:30</div>
-			<div>14:00</div>
-			<div>14:30</div>
-			<div>15:00</div>
-			<div>15:30</div>
-			<div>16:00</div>
-			<div>16:30</div>
-			<div>17:00</div>
-			<div>17:30</div>
-			<div>18:00</div>
-			<div>18:30</div>
-			<div>19:00</div>
-		</>
-	);
+  const createHours = () => {
+    const a = dayjs().set("hours", 8).startOf("hour").format("hh:mm");
+  };
+  createHours();
+  return (
+    <>
+      <CalendarBox>8:00</CalendarBox>
+      <CalendarBox>8:30</CalendarBox>
+      <CalendarBox>9:00</CalendarBox>
+      <CalendarBox>9:30</CalendarBox>
+      <CalendarBox>10:00</CalendarBox>
+      <CalendarBox>10:30</CalendarBox>
+      <CalendarBox>11:00</CalendarBox>
+      <CalendarBox>11:30</CalendarBox>
+      <CalendarBox>12:00</CalendarBox>
+      <CalendarBox>12:30</CalendarBox>
+      <CalendarBox>13:00</CalendarBox>
+      <CalendarBox>13:30</CalendarBox>
+      <CalendarBox>14:00</CalendarBox>
+      <CalendarBox>14:30</CalendarBox>
+      <CalendarBox>15:00</CalendarBox>
+      <CalendarBox>15:30</CalendarBox>
+      <CalendarBox>16:00</CalendarBox>
+      <CalendarBox>16:30</CalendarBox>
+      <CalendarBox>17:00</CalendarBox>
+      <CalendarBox>17:30</CalendarBox>
+      <CalendarBox>18:00</CalendarBox>
+      <CalendarBox>18:30</CalendarBox>
+    </>
+  );
 };
 export default WorkingHours;

@@ -1,0 +1,9 @@
+.box {
+  border: 2px solid black;
+  height: 50px;
+}
+
+.box:hover {
+  @apply bg-slate-500;
+  cursor: pointer;
+}

@@ -1,9 +1,39 @@
 .box {
-  border: 2px solid black;
-  height: 50px;
+	border: 2px solid black;
+	height: 50px;
 }
 
 .box:hover {
-  @apply bg-slate-500;
-  cursor: pointer;
+	&.available {
+		@apply bg-green-300;
+		cursor: pointer;
+	}
+	&.reserved {
+		@apply bg-yellow-300;
+		cursor: pointer;
+	}
+}
+
+.available {
+	@apply bg-green-400;
+}
+
+.closed {
+	@apply bg-red-400;
+}
+
+.unavailable {
+	@apply bg-gray-600;
+}
+
+.reserved {
+	@apply bg-yellow-400;
+}
+
+.break {
+	@apply bg-orange-400;
+}
+
+.default {
+	@apply bg-slate-400;
 }

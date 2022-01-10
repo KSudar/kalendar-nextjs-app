@@ -1,21 +1,24 @@
-import { Availability, WorkingShift } from "enums";
+import { Availability, WorkingShift } from 'enums'
 
-type TApointment = {
-  timestamp: number;
-  text: string;
-  slot: number;
-};
+type TAppointment = {
+  oib: string
+  text: string
+  timestamp?: number
+  date?: string
+  slot: number
+}
 
 type TDay = {
-  dayIndex: number;
-  dateDisplay: string;
-  dayDisplay: string;
-  workingHours: WorkingShift;
-};
+  timestamp: number
+  dayIndex: number
+  dateDisplay: string
+  dayDisplay: string
+  workingHours: WorkingShift
+}
 
 type TAvailability = {
-  slot: number;
-  available: Availability;
-};
+  slot: number
+  available: Availability
+}
 
-export type { TApointment, TDay, TAvailability };
+export type { TAppointment, TDay, TAvailability }

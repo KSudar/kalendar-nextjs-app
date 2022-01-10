@@ -3,8 +3,12 @@
 @tailwind utilities;
 
 h1 {
-	@apply text-4xl;
-	@apply text-center;
-	@apply my-8;
-	@apply uppercase;
+  @apply text-4xl;
+  @apply text-center;
+  @apply my-8;
+  @apply uppercase;
+}
+
+button {
+  @apply bg-slate-400 hover:bg-slate-700 text-white font-bold py-1 px-4 rounded my-1;
 }

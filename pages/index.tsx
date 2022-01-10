@@ -1,27 +1,47 @@
-import CalendarGrid from '@components/CalendarGrid';
-import { createAppointments, getAllApointments } from '@lib/ApiService';
-import { TDay } from '@types';
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import Image from 'next/image';
+import CalendarGrid from '@components/CalendarGrid'
+import {
+  clearAppointments,
+  generateAppointments,
+  getAllApointments,
+} from '@lib/apiService'
+import { TAppointment, TDay } from '@types'
+import Head from 'next/head'
+import { useState } from 'react'
 
-const Home = ({ allApointments }: { allApointments: TDay[] }) => {
-	return (
-		<div className='container'>
-			<Head>
-				<title>Calendar app</title>
-				<meta name='description' content='Weekly calendar app' />
-			</Head>
-			<h1>Kalendar App</h1>
-			<CalendarGrid allApointments={allApointments}></CalendarGrid>
-		</div>
-	);
-};
+const Home = ({ allAppointments }: { allAppointments: TAppointment[] }) => {
+  const [appointments, setAppointments] =
+    useState<TAppointment[]>(allAppointments)
+  const handleClear = async () => {
+    await clearAppointments()
+    const appointmentsTemp = await getAllApointments()
+    // console.log(appointmentsTemp)
+    setAppointments([...appointmentsTemp])
+  }
+  return (
+    <div>
+      <Head>
+        <title>Calendar app</title>
+        <meta name='description' content='Weekly calendar app' />
+      </Head>
+      <h1>Kalendar App</h1>
+      <div className='text-center'>
+        <button onClick={generateAppointments}>
+          Generate New Appointments
+        </button>
+      </div>
+      <div className='text-center'>
+        <button onClick={handleClear}>Clear Appointments</button>
+      </div>
+      <CalendarGrid allAppointments={appointments}></CalendarGrid>
+    </div>
+  )
+}
 
 export const getStaticProps = async () => {
-	await createAppointments();
-	const allAppointments = await getAllApointments();
-	return { props: { allAppointments } };
-};
+  await generateAppointments()
+  const allAppointments = await getAllApointments()
+  // console.log(allAppointments)
+  return { props: { allAppointments: allAppointments } }
+}
 
-export default Home;
+export default Home

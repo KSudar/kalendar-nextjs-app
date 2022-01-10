@@ -1,32 +1,32 @@
-import { TApointment, TAvailability, TDay } from "@types";
-import { generateEmptyDay } from "@utils/helper";
-import { Availability, WorkingShift } from "enums";
-import { useEffect, useState } from "react";
-import CalendarBox from "@components/CalendarBox";
+import { TAppointment, TAvailability, TDay } from '@types'
+import { generateEmptyDay, generateTimestamp } from '@utils/helper'
+import { Availability, HoursSlot, WorkingShift } from 'enums'
+import { useEffect, useState } from 'react'
+import CalendarBox from '@components/CalendarBox'
+import dayjs from 'dayjs'
 
 const CalendarDay = ({
   appointmentsToday,
   day,
 }: {
-  appointmentsToday?: TApointment[];
-  day: TDay;
+  appointmentsToday?: TAppointment[]
+  day: TDay
 }) => {
-  console.log(day.dayDisplay, day.dateDisplay);
   const [appointments, setAppointments] = useState<TAvailability[]>(
     generateEmptyDay(day.workingHours)
-  );
+  )
 
   useEffect(() => {
-    const apointmentsTemp = [...appointments];
+    const apointmentsTemp = [...appointments]
     appointmentsToday?.forEach(
       (appointment) =>
         (apointmentsTemp[appointment.slot] = {
           available: Availability.Unavailable,
           slot: appointment.slot,
         })
-    );
-    setAppointments([...apointmentsTemp]);
-  }, [day]);
+    )
+    setAppointments([...apointmentsTemp])
+  }, [day])
 
   return (
     <>
@@ -39,7 +39,7 @@ const CalendarDay = ({
         </CalendarBox>
       ))}
     </>
-  );
-};
+  )
+}
 
-export default CalendarDay;
+export default CalendarDay

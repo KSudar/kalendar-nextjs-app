@@ -19,6 +19,7 @@
 			"@components/*": ["./components/*"],
 			"@utils/*": ["utils/*"],
 			"@types": ["types"],
+			"@config": ["config"],
 			"@types/*": ["types/*"],
 			"@lib/*": ["lib/*"],
 			"@styles/*": ["styles/*"],

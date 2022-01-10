@@ -1,6 +1,6 @@
 import { Availability, WorkingShift } from 'enums'
 
-type TAppointment = {
+type Appointment = {
   oib: string
   text: string
   timestamp?: number
@@ -8,7 +8,9 @@ type TAppointment = {
   slot: number
 }
 
-type TDay = {
+type AllAppointments = { [key: number]: Appointment[] }
+
+type Day = {
   timestamp: number
   dayIndex: number
   dateDisplay: string
@@ -16,9 +18,9 @@ type TDay = {
   workingHours: WorkingShift
 }
 
-type TAvailability = {
+type AvailabilityType = {
   slot: number
   available: Availability
 }
 
-export type { TAppointment, TDay, TAvailability }
+export type { Appointment, Day, AvailabilityType, AllAppointments }

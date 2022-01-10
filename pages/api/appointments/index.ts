@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import fs from 'fs'
-import { TAppointment } from '@types'
-import { appointmentsFilePath, extractAppointments } from '@lib/dataHelpers'
+import { Appointment } from '@types'
+import { appointmentsFilePath, extracAppointments } from '@lib/dataHelpers'
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
@@ -10,22 +10,14 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
 
     //store that in a database or a file
     const filePath = appointmentsFilePath()
-    const data: TAppointment[] = extractAppointments(filePath)
+    const data: Appointment[] = extracAppointments(filePath)
     const usersAppointments = data.filter((appointment) => {
       return appointment.oib === oib
     })
     if (usersAppointments.length >= 2) {
-      res
-        .status(403)
-        .json({ message: 'You already have 2 appointments this week' })
-    } else if (
-      !!usersAppointments.find(
-        (appointment) => appointment.timestamp === timestamp
-      )
-    ) {
-      res
-        .status(403)
-        .json({ message: 'You already have 1 appointment on this day' })
+      res.status(403).json({ message: 'You already have 2 appointments this week' })
+    } else if (!!usersAppointments.find((appointment) => appointment.timestamp === timestamp)) {
+      res.status(403).json({ message: 'You already have 1 appointment on this day' })
     } else {
       data.push(newAppointment)
       fs.writeFileSync(filePath, JSON.stringify(data))
@@ -36,7 +28,7 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
     }
   } else {
     const filePath = appointmentsFilePath()
-    const data = extractAppointments(filePath)
+    const data = extracAppointments(filePath)
     res.status(200).json({
       data,
     })

@@ -1,22 +1,18 @@
 import CalendarGrid from '@components/CalendarGrid'
-import {
-  clearAppointments,
-  generateAppointments,
-  getAllApointments,
-} from '@lib/apiService'
-import { TAppointment, TDay } from '@types'
+import { clearAppointments, generateAppointments, getAllApointments } from '@lib/apiService'
+import { AllAppointments, Appointment, Day } from '@types'
 import Head from 'next/head'
 import { useState } from 'react'
 
-const Home = ({ allAppointments }: { allAppointments: TAppointment[] }) => {
-  const [appointments, setAppointments] =
-    useState<TAppointment[]>(allAppointments)
+const Home = ({ allAppointments }: { allAppointments: AllAppointments }) => {
+  const [appointments, seAppointments] = useState<AllAppointments>(allAppointments)
+
   const handleClear = async () => {
     await clearAppointments()
     const appointmentsTemp = await getAllApointments()
-    // console.log(appointmentsTemp)
-    setAppointments([...appointmentsTemp])
+    seAppointments({ ...appointmentsTemp })
   }
+
   return (
     <div>
       <Head>
@@ -25,9 +21,7 @@ const Home = ({ allAppointments }: { allAppointments: TAppointment[] }) => {
       </Head>
       <h1>Kalendar App</h1>
       <div className='text-center'>
-        <button onClick={generateAppointments}>
-          Generate New Appointments
-        </button>
+        <button onClick={generateAppointments}>Generate New Appointments</button>
       </div>
       <div className='text-center'>
         <button onClick={handleClear}>Clear Appointments</button>
@@ -40,7 +34,6 @@ const Home = ({ allAppointments }: { allAppointments: TAppointment[] }) => {
 export const getStaticProps = async () => {
   await generateAppointments()
   const allAppointments = await getAllApointments()
-  // console.log(allAppointments)
   return { props: { allAppointments: allAppointments } }
 }
 

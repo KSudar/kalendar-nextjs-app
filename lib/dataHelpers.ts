@@ -5,10 +5,10 @@ const appointmentsFilePath = () => {
   return path.join(process.cwd(), 'data', 'appointments.json')
 }
 
-const extractAppointments = (filePath: string) => {
+const extracAppointments = (filePath: string) => {
   const fileData: Buffer = fs.readFileSync(filePath)
   const data = JSON.parse(String(fileData))
   return data
 }
 
-export { appointmentsFilePath, extractAppointments }
+export { appointmentsFilePath, extracAppointments }

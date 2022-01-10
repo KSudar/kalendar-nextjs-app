@@ -3,39 +3,22 @@ import { DaysOfTheWeek, WorkingShift } from 'enums'
 import dayjs, { Dayjs } from 'dayjs'
 import WorkingHours from '@components/WorkingHours'
 import { useEffect, useState } from 'react'
-import { TAppointment, TDay } from '@types'
+import { AllAppointments, Appointment, Day } from '@types'
 import styles from './CalendarGrid.module.scss'
 import { createDay, getWorkingShift } from '@utils/helper'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 // import styles from ''
 
-const CalendarGrid = ({
-  allAppointments,
-}: {
-  allAppointments: TAppointment[]
-}) => {
-  const [appointments, setAppointments] =
-    useState<TAppointment[]>(allAppointments)
-  const [thisWeek, setThisWeek] = useState<TDay[]>([])
-  // console.log(allAppointments)
-
-  // const createDay = (dayOffset: number) => {
-  //   const day = dayjs().add(dayOffset, 'day').startOf('day')
-  //   return {
-  //     timestamp: day.valueOf(),
-  //     dayIndex: day.day(),
-  //     workingHours: getWorkingShift(day),
-  //     dateDisplay: day.format('ddd DD.MM.YY.'),
-  //     dayDisplay: DaysOfTheWeek[day.day()],
-  //   }
-  // }
+const CalendarGrid = ({ allAppointments }: { allAppointments: AllAppointments }) => {
+  const [appointments, seAppointments] = useState<AllAppointments>(allAppointments)
+  const [thisWeek, setThisWeek] = useState<Day[]>([])
 
   useEffect(() => {
-    setAppointments([...allAppointments])
+    seAppointments({ ...allAppointments })
   }, [allAppointments])
 
   useEffect(() => {
-    const thisWeekTemp: TDay[] = []
+    const thisWeekTemp: Day[] = []
     for (let dayOffset = 1; dayOffset <= 7; dayOffset++) {
       thisWeekTemp.push(createDay(dayOffset))
     }
@@ -56,15 +39,11 @@ const CalendarGrid = ({
             <div>{day.dateDisplay}</div>
           </div>
           <div>
-            <CalendarDay
-              appointmentsToday={appointments.filter((appointment) => {
-                return appointment.timestamp === day.timestamp
-              })}
-              day={day}
-            />
+            <CalendarDay appointmentsToday={appointments[day.timestamp]} day={day} />
           </div>
         </div>
       ))}
+      <div id='modal'></div>
     </div>
   )
 }

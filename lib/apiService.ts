@@ -1,4 +1,4 @@
-import { TAppointment, TAvailability } from '@types'
+import { AllAppointments, Appointment, AvailabilityType } from '@types'
 import { server } from '@config'
 import { Availability } from 'enums'
 import {
@@ -18,9 +18,9 @@ const clearAppointments = async () => {
 const generateAppointments = async () => {
   await fetch(`${server}/api/appointments/clear`)
 
-  const appointments: TAppointment[] = []
+  const appointments: Appointment[] = []
   const possibleAppointments: {
-    [key: string | number]: (TAvailability | undefined)[]
+    [key: number]: (AvailabilityType | undefined)[]
   } = {}
   for (let offset = 0; offset < 7; offset++) {
     const { timestamp, workingHours } = createDay(offset)
@@ -34,20 +34,21 @@ const generateAppointments = async () => {
 
   for (let i = 0; i < 15; i++) {
     const possibleDays = Object.keys(possibleAppointments)
+    if (!possibleDays.length) {
+      break
+    }
     const randomDay = Math.floor(Math.random() * possibleDays.length)
     const dayTimestamp = Number(possibleDays[randomDay])
     const availableSlots = possibleAppointments[dayTimestamp]
     const randomSlot = availableSlots.splice(
       Math.floor(Math.random() * availableSlots.length),
       1
-    )[0]
+    )[0]?.slot
+    appointments.push(generateAppointment(dayTimestamp, randomSlot!))
     if (!availableSlots.length) {
       delete possibleAppointments[dayTimestamp]
     }
-    appointments.push(generateAppointment(dayTimestamp, randomSlot!.slot))
   }
-
-  console.log(appointments)
 
   const response = await fetch(`${server}/api/appointments/generate`, {
     method: 'POST',
@@ -58,23 +59,25 @@ const generateAppointments = async () => {
   })
 
   const data = await response.json()
-  // console.log('DATA ', data)
   return data
 }
 
 const getAllApointments = async () => {
   const response = await fetch(`${server}/api/appointments`)
   const { data } = await response.json()
-  const appointments = data.map((appointment: TAppointment) => {
-    const { slot, date, timestamp } = generateSlotAndDate(
-      appointment.timestamp!
-    )
-    return { ...appointment, slot, date, timestamp }
+  const appointments: AllAppointments = {}
+  data.forEach((appointment: Appointment) => {
+    const { slot, date, timestamp } = generateSlotAndDate(appointment.timestamp!)
+    const currentAppointmentsAtTimestamp = appointments[timestamp] || []
+    appointments[timestamp] = [
+      ...currentAppointmentsAtTimestamp,
+      { ...appointment, slot, date, timestamp },
+    ]
   })
   return appointments
 }
 
-const createAppointment = async (appointment: TAppointment) => {
+const createAppointment = async (appointment: Appointment) => {
   const timestamp = generateTimestamp(appointment.date!, appointment.slot)
 
   const params = { timestamp, oib: appointment.oib, text: appointment.text }
@@ -89,9 +92,4 @@ const createAppointment = async (appointment: TAppointment) => {
   return data
 }
 
-export {
-  clearAppointments,
-  createAppointment,
-  generateAppointments,
-  getAllApointments,
-}
+export { clearAppointments, createAppointment, generateAppointments, getAllApointments }

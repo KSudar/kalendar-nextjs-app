@@ -1,4 +1,4 @@
-import { TAppointment, TAvailability, TDay } from '@types'
+import { Appointment, AvailabilityType, Day } from '@types'
 import { generateEmptyDay, generateTimestamp } from '@utils/helper'
 import { Availability, HoursSlot, WorkingShift } from 'enums'
 import { useEffect, useState } from 'react'
@@ -9,14 +9,15 @@ const CalendarDay = ({
   appointmentsToday,
   day,
 }: {
-  appointmentsToday?: TAppointment[]
-  day: TDay
+  appointmentsToday?: Appointment[]
+  day: Day
 }) => {
-  const [appointments, setAppointments] = useState<TAvailability[]>(
+  const [appointments, seAppointments] = useState<AvailabilityType[]>(
     generateEmptyDay(day.workingHours)
   )
 
   useEffect(() => {
+    console.log('CALENDAR DAY ', appointmentsToday)
     const apointmentsTemp = [...appointments]
     appointmentsToday?.forEach(
       (appointment) =>
@@ -25,8 +26,10 @@ const CalendarDay = ({
           slot: appointment.slot,
         })
     )
-    setAppointments([...apointmentsTemp])
-  }, [day])
+    seAppointments([...apointmentsTemp])
+  }, [day, appointmentsToday])
+
+  const addAppointment = () => {}
 
   return (
     <>
@@ -34,6 +37,7 @@ const CalendarDay = ({
         <CalendarBox
           key={appointment.slot}
           availability={appointment.available}
+          onClick={appointment.available === Availability.Available ? addAppointment : null}
         >
           {Availability[appointment.available]}
         </CalendarBox>

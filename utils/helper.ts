@@ -1,4 +1,4 @@
-import { TAppointment } from '@types'
+import { Appointment } from '@types'
 import dayjs, { Dayjs } from 'dayjs'
 import { Availability, DaysOfTheWeek, HoursSlot, WorkingShift } from 'enums'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -28,17 +28,18 @@ const generateSlotAndDate = (preciseTimestamp: number) => {
   return { date, slot, timestamp: startOfTheDayTimestamp }
 }
 
-const generateAppointment = (timestamp: number, slot: number): TAppointment => {
+const generateAppointment = (dayTimestamp: number, slot: number): Appointment => {
+  const dateDisplay = dayjs(dayTimestamp).format('ddd DD.MM.YY.')
+  const preciseTimestamp = generateTimestamp(dateDisplay, slot)
   return {
-    timestamp,
+    timestamp: preciseTimestamp,
     oib: generateOib(),
-    text: `Timestamp: ${timestamp}`,
+    text: `Timestamp: ${dayTimestamp}`,
     slot: slot!,
   }
 }
 
 const getWorkingShift = (day: Dayjs) => {
-  // console.log('HMMM ', day.day(), day.date(), day.format('ddd'))
   if (day.date() % 2 === 0 && day.day() > 0) {
     return WorkingShift.Morning
   } else if (day.date() % 2 !== 0 && day.day() > 0 && day.day() < 6) {
@@ -70,7 +71,9 @@ const generateOib = () => {
 }
 
 const createDay = (dayOffset: number) => {
-  const day = dayjs().add(dayOffset, 'day').startOf('day')
+  const dayObject = dayjs().add(dayOffset, 'day').startOf('day')
+  const isToday = dayObject.valueOf() === dayjs().startOf('day').valueOf()
+  const day = dayObject.add(isToday ? 7 : 0, 'day')
   return {
     timestamp: day.valueOf(),
     dayIndex: day.day(),

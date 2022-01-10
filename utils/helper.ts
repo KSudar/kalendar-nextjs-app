@@ -1,12 +1,14 @@
 import { TAppointment } from '@types'
 import dayjs, { Dayjs } from 'dayjs'
-import { Availability, HoursSlot, WorkingShift } from 'enums'
+import { Availability, DaysOfTheWeek, HoursSlot, WorkingShift } from 'enums'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 
 export const generateRandomDay = (): Dayjs => {
   const dayOfTheWeek = Math.floor(Math.random() * 6 + 1) // doesn't include 0 which is Sunday
-  const dateObject = dayjs().day(dayOfTheWeek).startOf('day')
-  if (dayOfTheWeek == 6 && dateObject.date() % 2 !== 0) {
+  const randomDay = dayjs().day(dayOfTheWeek).startOf('day')
+  const isToday = randomDay.valueOf() === dayjs().startOf('day').valueOf()
+  const dateObject = randomDay.add(isToday ? 7 : 0, 'day')
+  if (getWorkingShift(dateObject) === WorkingShift.Closed) {
     return generateRandomDay()
   } else {
     return dateObject
@@ -26,45 +28,17 @@ const generateSlotAndDate = (preciseTimestamp: number) => {
   return { date, slot, timestamp: startOfTheDayTimestamp }
 }
 
-const generateAppointment = (
-  day: string,
-  workingShift: WorkingShift
-): TAppointment => {
-  const possibleAppointments: number[] = []
-  let timestamp
-  let randomSlot
-  for (let i = 0; i < 22; i++) {
-    if (i !== 6 && i !== 16) {
-      possibleAppointments.push(i)
-    }
-  }
-
-  const generateRandomSlot = (max: number, min = 0): number => {
-    const randomSlot = Math.floor(Math.random() * (max - min)) + min
-    if (possibleAppointments.includes(randomSlot)) {
-      return randomSlot
-    } else {
-      return generateRandomSlot(min, max)
-    }
-  }
-  // console.log(possibleAppointments)
-  if (workingShift === WorkingShift.Morning) {
-    randomSlot = generateRandomSlot(HoursSlot['14:00'])
-    timestamp = generateTimestamp(day, randomSlot)
-  } else if (workingShift === WorkingShift.Afternoon) {
-    randomSlot = generateRandomSlot(HoursSlot['19:00'], HoursSlot['13:00'])
-    timestamp = generateTimestamp(day, randomSlot)
-  }
+const generateAppointment = (timestamp: number, slot: number): TAppointment => {
   return {
     timestamp,
     oib: generateOib(),
     text: `Timestamp: ${timestamp}`,
-    slot: randomSlot,
+    slot: slot!,
   }
 }
 
 const getWorkingShift = (day: Dayjs) => {
-  console.log('HMMM ', day.day(), day.date(), day.format('ddd'))
+  // console.log('HMMM ', day.day(), day.date(), day.format('ddd'))
   if (day.date() % 2 === 0 && day.day() > 0) {
     return WorkingShift.Morning
   } else if (day.date() % 2 !== 0 && day.day() > 0 && day.day() < 6) {
@@ -93,6 +67,17 @@ const generateOib = () => {
   oibDigits[10] = controlNumber
   oib += controlNumber.toString()
   return oib
+}
+
+const createDay = (dayOffset: number) => {
+  const day = dayjs().add(dayOffset, 'day').startOf('day')
+  return {
+    timestamp: day.valueOf(),
+    dayIndex: day.day(),
+    workingHours: getWorkingShift(day),
+    dateDisplay: day.format('ddd DD.MM.YY.'),
+    dayDisplay: DaysOfTheWeek[day.day()],
+  }
 }
 
 const generateEmptyDay = (shift: WorkingShift) => {
@@ -124,4 +109,5 @@ export {
   generateAppointment,
   generateTimestamp,
   generateSlotAndDate,
+  createDay,
 }

@@ -5,7 +5,7 @@ import WorkingHours from '@components/WorkingHours'
 import { useEffect, useState } from 'react'
 import { TAppointment, TDay } from '@types'
 import styles from './CalendarGrid.module.scss'
-import { getWorkingShift } from '@utils/helper'
+import { createDay, getWorkingShift } from '@utils/helper'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 // import styles from ''
 
@@ -14,18 +14,25 @@ const CalendarGrid = ({
 }: {
   allAppointments: TAppointment[]
 }) => {
+  const [appointments, setAppointments] =
+    useState<TAppointment[]>(allAppointments)
   const [thisWeek, setThisWeek] = useState<TDay[]>([])
   // console.log(allAppointments)
-  const createDay = (dayOffset: number) => {
-    const day = dayjs().add(dayOffset, 'day').startOf('day')
-    return {
-      timestamp: day.valueOf(),
-      dayIndex: day.day(),
-      workingHours: getWorkingShift(day),
-      dateDisplay: day.format('ddd DD.MM.YY.'),
-      dayDisplay: DaysOfTheWeek[day.day()],
-    }
-  }
+
+  // const createDay = (dayOffset: number) => {
+  //   const day = dayjs().add(dayOffset, 'day').startOf('day')
+  //   return {
+  //     timestamp: day.valueOf(),
+  //     dayIndex: day.day(),
+  //     workingHours: getWorkingShift(day),
+  //     dateDisplay: day.format('ddd DD.MM.YY.'),
+  //     dayDisplay: DaysOfTheWeek[day.day()],
+  //   }
+  // }
+
+  useEffect(() => {
+    setAppointments([...allAppointments])
+  }, [allAppointments])
 
   useEffect(() => {
     const thisWeekTemp: TDay[] = []
@@ -50,11 +57,7 @@ const CalendarGrid = ({
           </div>
           <div>
             <CalendarDay
-              appointmentsToday={allAppointments.filter((appointment) => {
-                console.log(
-                  dayjs(day.timestamp).toString(),
-                  dayjs(appointment.timestamp).toString()
-                )
+              appointmentsToday={appointments.filter((appointment) => {
                 return appointment.timestamp === day.timestamp
               })}
               day={day}

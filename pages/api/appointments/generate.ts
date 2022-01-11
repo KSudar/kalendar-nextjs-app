@@ -5,10 +5,7 @@ import { appointmentsFilePath } from '@lib/dataHelpers'
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     const appointments = req.body
-
-    //store that in a database or a file
     const filePath = appointmentsFilePath()
-
     fs.writeFileSync(filePath, JSON.stringify(appointments))
     res.status(201).json({
       message: 'Success!',

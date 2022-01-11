@@ -1,13 +1,9 @@
 import CalendarDay from '@components/CalendarDay'
-import { DaysOfTheWeek, WorkingShift } from 'enums'
-import dayjs, { Dayjs } from 'dayjs'
 import WorkingHours from '@components/WorkingHours'
 import { useEffect, useState } from 'react'
 import { AllAppointments, Appointment, Day } from '@types'
 import styles from './CalendarGrid.module.scss'
-import { createDay, getWorkingShift } from '@utils/helper'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-// import styles from ''
+import { createDay } from '@utils/helper'
 
 const CalendarGrid = ({ allAppointments }: { allAppointments: AllAppointments }) => {
   const [appointments, seAppointments] = useState<AllAppointments>(allAppointments)

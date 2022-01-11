@@ -1,12 +1,13 @@
+import { basePath } from '@config'
 import fs from 'fs'
 import path from 'path'
 
 const appointmentsFilePath = () => {
-  return path.join(process.cwd(), 'data', 'generatedAppointments.json')
+  return path.join(basePath, 'data', 'generatedAppointments.json')
 }
 
 const userAppointmentsFilePath = () => {
-  return path.join(process.cwd(), 'data', 'userAppointments.json')
+  return path.join(basePath, 'data', 'userAppointments.json')
 }
 
 const extractAppointments = (filePath: string) => {

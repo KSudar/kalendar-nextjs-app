@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import styles from './Notification.module.scss'
 import ReactDOM from 'react-dom'
 
-function Notification({
+const Notification = ({
   message,
   status,
   onClick,
@@ -10,7 +10,7 @@ function Notification({
   message: string
   status: string
   onClick?: () => void
-}) {
+}) => {
   let statusClasses = ''
   const [displayNotification, setDisplayNotification] = useState(false)
 

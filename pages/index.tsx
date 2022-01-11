@@ -7,10 +7,10 @@ import {
 } from '@lib/apiService'
 import { AllAppointments } from '@types'
 import Head from 'next/head'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-const Home = ({ allAppointments }: { allAppointments: AllAppointments }) => {
-  const [appointments, seAppointments] = useState<AllAppointments>(allAppointments)
+const Home = () => {
+  const [appointments, seAppointments] = useState<AllAppointments>({})
 
   const handleGenerate = async () => {
     await generateAppointments()
@@ -29,6 +29,10 @@ const Home = ({ allAppointments }: { allAppointments: AllAppointments }) => {
     const appointmentsTemp = await getAllAppointments()
     seAppointments({ ...appointmentsTemp })
   }
+
+  useEffect(() => {
+    handleGenerate()
+  }, [])
 
   return (
     <div>
@@ -49,12 +53,6 @@ const Home = ({ allAppointments }: { allAppointments: AllAppointments }) => {
       <CalendarGrid allAppointments={appointments}></CalendarGrid>
     </div>
   )
-}
-
-export const getStaticProps = async () => {
-  await generateAppointments()
-  const allAppointments = await getAllAppointments()
-  return { props: { allAppointments: allAppointments } }
 }
 
 export default Home

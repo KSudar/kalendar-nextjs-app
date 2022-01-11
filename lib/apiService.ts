@@ -5,18 +5,28 @@ import {
   createDay,
   generateAppointment,
   generateEmptyDay,
-  generateRandomDay,
   generateSlotAndDate,
-  generateTimestamp,
-  getWorkingShift,
+  generatePreciseTimestamp,
 } from '@utils/helper'
+import dayjs from 'dayjs'
 
 const clearAppointments = async () => {
   await fetch(`${server}/api/appointments/clear`)
 }
 
+const clearUserAppointments = async () => {
+  await fetch(`${server}/api/appointments/usersAppointments`, { method: 'DELETE' })
+}
+
 const generateAppointments = async () => {
   await fetch(`${server}/api/appointments/clear`)
+
+  const uAResponse = await fetch(`${server}/api/appointments/usersAppointments`)
+  const { data: uAData } = await uAResponse.json()
+  const usersAppointments = uAData.map((userAppointment: Appointment) => {
+    const timestamp = dayjs(userAppointment.timestamp).startOf('day').valueOf()
+    return { ...userAppointment, timestamp }
+  })
 
   const appointments: Appointment[] = []
   const possibleAppointments: {
@@ -31,6 +41,25 @@ const generateAppointments = async () => {
       possibleAppointments[timestamp] = daySlots
     }
   }
+
+  // Remove users created appointments from empty slots
+  usersAppointments.forEach((userAppointment: Appointment) => {
+    const dayTimestamp = userAppointment.timestamp!
+    const availableSlots = possibleAppointments[dayTimestamp]
+    let indexToDelete
+    availableSlots.find((available, index) => {
+      if (available?.slot === userAppointment.slot) {
+        indexToDelete = index
+      }
+      return available?.slot === userAppointment.slot
+    })
+    if (indexToDelete !== undefined) {
+      availableSlots.splice(indexToDelete, 1)
+    }
+    if (!availableSlots.length) {
+      delete possibleAppointments[dayTimestamp]
+    }
+  })
 
   for (let i = 0; i < 15; i++) {
     const possibleDays = Object.keys(possibleAppointments)
@@ -62,7 +91,7 @@ const generateAppointments = async () => {
   return data
 }
 
-const getAllApointments = async () => {
+const getAllAppointments = async () => {
   const response = await fetch(`${server}/api/appointments`)
   const { data } = await response.json()
   const appointments: AllAppointments = {}
@@ -78,18 +107,32 @@ const getAllApointments = async () => {
 }
 
 const createAppointment = async (appointment: Appointment) => {
-  const timestamp = generateTimestamp(appointment.date!, appointment.slot)
+  const timestamp = generatePreciseTimestamp(appointment.date!, appointment.slot)
 
-  const params = { timestamp, oib: appointment.oib, text: appointment.text }
+  const params = {
+    timestamp,
+    oib: appointment.oib,
+    text: appointment.text,
+    name: appointment.name,
+    slot: appointment.slot,
+  }
+
   const response = await fetch(`${server}/api/appointments`, {
     method: 'POST',
     body: JSON.stringify(params),
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'appl ication/json',
     },
   })
   const data = await response.json()
+
   return data
 }
 
-export { clearAppointments, createAppointment, generateAppointments, getAllApointments }
+export {
+  clearAppointments,
+  createAppointment,
+  generateAppointments,
+  getAllAppointments,
+  clearUserAppointments,
+}

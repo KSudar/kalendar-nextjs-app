@@ -43,7 +43,6 @@ const CalendarGrid = ({ allAppointments }: { allAppointments: AllAppointments })
           </div>
         </div>
       ))}
-      <div id='modal'></div>
     </div>
   )
 }

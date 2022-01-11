@@ -1,15 +1,32 @@
 import CalendarGrid from '@components/CalendarGrid'
-import { clearAppointments, generateAppointments, getAllApointments } from '@lib/apiService'
-import { AllAppointments, Appointment, Day } from '@types'
+import {
+  clearAppointments,
+  clearUserAppointments,
+  generateAppointments,
+  getAllAppointments,
+} from '@lib/apiService'
+import { AllAppointments } from '@types'
 import Head from 'next/head'
 import { useState } from 'react'
 
 const Home = ({ allAppointments }: { allAppointments: AllAppointments }) => {
   const [appointments, seAppointments] = useState<AllAppointments>(allAppointments)
 
+  const handleGenerate = async () => {
+    await generateAppointments()
+    const appointmentsTemp = await getAllAppointments()
+    seAppointments({ ...appointmentsTemp })
+  }
+
   const handleClear = async () => {
     await clearAppointments()
-    const appointmentsTemp = await getAllApointments()
+    const appointmentsTemp = await getAllAppointments()
+    seAppointments({ ...appointmentsTemp })
+  }
+
+  const handleClearUsersAppointments = async () => {
+    await clearUserAppointments()
+    const appointmentsTemp = await getAllAppointments()
     seAppointments({ ...appointmentsTemp })
   }
 
@@ -21,10 +38,13 @@ const Home = ({ allAppointments }: { allAppointments: AllAppointments }) => {
       </Head>
       <h1>Kalendar App</h1>
       <div className='text-center'>
-        <button onClick={generateAppointments}>Generate New Appointments</button>
+        <button onClick={handleGenerate}>Generate New Appointments</button>
       </div>
       <div className='text-center'>
         <button onClick={handleClear}>Clear Appointments</button>
+      </div>
+      <div className='text-center'>
+        <button onClick={handleClearUsersAppointments}>{`Clear User's Appointments`}</button>
       </div>
       <CalendarGrid allAppointments={appointments}></CalendarGrid>
     </div>
@@ -33,7 +53,7 @@ const Home = ({ allAppointments }: { allAppointments: AllAppointments }) => {
 
 export const getStaticProps = async () => {
   await generateAppointments()
-  const allAppointments = await getAllApointments()
+  const allAppointments = await getAllAppointments()
   return { props: { allAppointments: allAppointments } }
 }
 

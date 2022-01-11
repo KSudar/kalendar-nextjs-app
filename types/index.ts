@@ -6,6 +6,7 @@ type Appointment = {
   timestamp?: number
   date?: string
   slot: number
+  name: string
 }
 
 type AllAppointments = { [key: number]: Appointment[] }

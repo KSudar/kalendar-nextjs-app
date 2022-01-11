@@ -1,37 +1,28 @@
-import { WorkingShift } from "enums";
-import CalendarBox from "@components/CalendarBox";
-import dayjs from "dayjs";
+import CalendarBox from '@components/CalendarBox'
+import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
 
 const WorkingHours = () => {
+  const [hours, setHours] = useState<string[]>([])
   const createHours = () => {
-    const a = dayjs().set("hours", 8).startOf("hour").format("hh:mm");
-  };
-  createHours();
+    const hoursTemp = []
+    let startHour = dayjs().set('hours', 8).startOf('hour')
+    for (let i = 0; i <= 630; i += 30) {
+      hoursTemp.push(startHour.add(i, 'minute').format('HH:mm'))
+    }
+    setHours([...hoursTemp])
+  }
+
+  useEffect(() => {
+    createHours()
+  }, [])
+
   return (
     <>
-      <CalendarBox>8:00</CalendarBox>
-      <CalendarBox>8:30</CalendarBox>
-      <CalendarBox>9:00</CalendarBox>
-      <CalendarBox>9:30</CalendarBox>
-      <CalendarBox>10:00</CalendarBox>
-      <CalendarBox>10:30</CalendarBox>
-      <CalendarBox>11:00</CalendarBox>
-      <CalendarBox>11:30</CalendarBox>
-      <CalendarBox>12:00</CalendarBox>
-      <CalendarBox>12:30</CalendarBox>
-      <CalendarBox>13:00</CalendarBox>
-      <CalendarBox>13:30</CalendarBox>
-      <CalendarBox>14:00</CalendarBox>
-      <CalendarBox>14:30</CalendarBox>
-      <CalendarBox>15:00</CalendarBox>
-      <CalendarBox>15:30</CalendarBox>
-      <CalendarBox>16:00</CalendarBox>
-      <CalendarBox>16:30</CalendarBox>
-      <CalendarBox>17:00</CalendarBox>
-      <CalendarBox>17:30</CalendarBox>
-      <CalendarBox>18:00</CalendarBox>
-      <CalendarBox>18:30</CalendarBox>
+      {hours.map((hour: string) => (
+        <CalendarBox key={hour}>{hour}</CalendarBox>
+      ))}
     </>
-  );
-};
-export default WorkingHours;
+  )
+}
+export default WorkingHours

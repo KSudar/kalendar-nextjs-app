@@ -3,19 +3,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { Availability, DaysOfTheWeek, HoursSlot, WorkingShift } from 'enums'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 
-export const generateRandomDay = (): Dayjs => {
-  const dayOfTheWeek = Math.floor(Math.random() * 6 + 1) // doesn't include 0 which is Sunday
-  const randomDay = dayjs().day(dayOfTheWeek).startOf('day')
-  const isToday = randomDay.valueOf() === dayjs().startOf('day').valueOf()
-  const dateObject = randomDay.add(isToday ? 7 : 0, 'day')
-  if (getWorkingShift(dateObject) === WorkingShift.Closed) {
-    return generateRandomDay()
-  } else {
-    return dateObject
-  }
-}
-
-const generateTimestamp = (date: string, slot: HoursSlot) => {
+const generatePreciseTimestamp = (date: string, slot: HoursSlot) => {
   dayjs.extend(customParseFormat)
   return dayjs(`${date} ${HoursSlot[slot]}`, 'ddd DD.MM.YY. HH:mm').valueOf()
 }
@@ -30,12 +18,13 @@ const generateSlotAndDate = (preciseTimestamp: number) => {
 
 const generateAppointment = (dayTimestamp: number, slot: number): Appointment => {
   const dateDisplay = dayjs(dayTimestamp).format('ddd DD.MM.YY.')
-  const preciseTimestamp = generateTimestamp(dateDisplay, slot)
+  const preciseTimestamp = generatePreciseTimestamp(dateDisplay, slot)
   return {
     timestamp: preciseTimestamp,
     oib: generateOib(),
     text: `Timestamp: ${dayTimestamp}`,
     slot: slot!,
+    name: 'Ime Prezime',
   }
 }
 
@@ -70,6 +59,24 @@ const generateOib = () => {
   return oib
 }
 
+const isOibValid = (oib: string): boolean => {
+  if (!/^[0-9]{11}$/.test(oib)) return false
+
+  let a = 10
+  for (const digit of oib.substring(0, 10)) {
+    a += parseInt(digit)
+    a %= 10
+    if (a === 0) a = 10
+    a *= 2
+    a %= 11
+  }
+
+  let controlDigit = 11 - a
+  if (controlDigit === 10) controlDigit = 0
+
+  return controlDigit === parseInt(oib.substr(10, 1)) //could use oib.split('').splice(10,1).join('')
+}
+
 const createDay = (dayOffset: number) => {
   const dayObject = dayjs().add(dayOffset, 'day').startOf('day')
   const isToday = dayObject.valueOf() === dayjs().startOf('day').valueOf()
@@ -96,7 +103,10 @@ const generateEmptyDay = (shift: WorkingShift) => {
     } else {
       availability = Availability.Available
     }
-    if ((i === 6 || i === 16) && availability === Availability.Available) {
+    if (
+      (i === HoursSlot['11:00'] || i === HoursSlot['16:00']) &&
+      availability !== Availability.Closed
+    ) {
       availability = Availability.Break
     }
 
@@ -110,7 +120,8 @@ export {
   getWorkingShift,
   generateOib,
   generateAppointment,
-  generateTimestamp,
+  generatePreciseTimestamp,
   generateSlotAndDate,
   createDay,
+  isOibValid,
 }

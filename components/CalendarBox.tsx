@@ -8,7 +8,7 @@ const CalendarBox = ({
 }: {
   children: JSX.Element | string
   availability?: Availability
-  onClick: (() => void) | null
+  onClick?: (() => void) | null
 }) => {
   const [backgroundColor, setBackgroundColor] = useState<string>()
 
@@ -27,8 +27,15 @@ const CalendarBox = ({
       setBackgroundColor(styles.default)
     }
   }, [availability])
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick()
+    }
+  }
+
   return (
-    <div className={`${styles.box} ${backgroundColor} shadow-xl`} onClick={onClick}>
+    <div className={`${styles.box} ${backgroundColor} shadow-xl`} onClick={handleClick}>
       {children}
     </div>
   )

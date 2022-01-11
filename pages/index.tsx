@@ -35,7 +35,7 @@ const Home = () => {
   }, [])
 
   return (
-    <div>
+    <div className='p-3'>
       <Head>
         <title>Calendar app</title>
         <meta name='description' content='Weekly calendar app' />
@@ -50,7 +50,9 @@ const Home = () => {
       <div className='text-center'>
         <button onClick={handleClearUsersAppointments}>{`Clear User's Appointments`}</button>
       </div>
-      <CalendarGrid allAppointments={appointments}></CalendarGrid>
+      <div>
+        <CalendarGrid allAppointments={appointments}></CalendarGrid>
+      </div>
     </div>
   )
 }

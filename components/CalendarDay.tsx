@@ -109,7 +109,7 @@ const CalendarDay = ({
           <div>
             <label htmlFor='oib'>Oib:</label>
             <input type='text' id='oib' ref={oibRef} required />
-            <span>*Za provjera rezerviranih termina je korišten OIB*</span>
+            <span>*Za provjera koliko je termina korisnik rezervirao je korišten OIB*</span>
           </div>
           <div>
             <label htmlFor='description'>Description:</label>

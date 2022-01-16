@@ -1,43 +1,49 @@
 import { Appointment, AvailabilityType, Day } from '@types'
 import { generateEmptyDay } from '@utils/helper'
 import { Availability } from 'enums'
-import React, { FormEvent, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import CalendarBox from '@components/CalendarBox'
-import Modal from 'react-modal'
 import { createAppointment } from '@lib/apiService'
 import Notification from '@components/ui/Notification'
+import CreateAppointmentModal from '@components/CreateAppointmentModal'
+import PreviewAppointmentModal from '@components/PreviewAppointmentModal'
 
 const CalendarDay = ({
   appointmentsToday,
   day,
+  oib,
+  userAppointmentsCount,
 }: {
   appointmentsToday?: Appointment[]
   day: Day
+  oib?: string
+  userAppointmentsCount?: number
 }) => {
-  const [appointments, setAppointments] = useState<AvailabilityType[]>(
+  const [availabilities, setAvailabilities] = useState<AvailabilityType[]>(
     generateEmptyDay(day.workingHours)
   )
+
+  const maxAppointmentsReached = !!userAppointmentsCount && userAppointmentsCount >= 2
+
   const [todayAppointments, setTodayAppointments] = useState<Appointment[]>(appointmentsToday || [])
   const [displayModal, setDisplayModal] = useState(false)
+  const [displayPreviewModal, setDisplayPreviewModal] = useState(false)
   const [notificationType, setNotificationType] = useState('')
   const [notificationText, setNotificationText] = useState('')
   const [appointmentSlot, setAppointmentSlot] = useState<number>()
-
-  const nameRef = useRef<HTMLInputElement>(null)
-  const oibRef = useRef<HTMLInputElement>(null)
-  const textRef = useRef<HTMLInputElement>(null)
-
+  const [appointmentToPreview, setAppointmentToPreview] = useState<Appointment>()
   useEffect(() => {
     const appointmentsTemp = generateEmptyDay(day.workingHours)
-    todayAppointments?.forEach(
-      (appointment) =>
-        (appointmentsTemp[appointment.slot] = {
-          available: Availability.Unavailable,
-          slot: appointment.slot,
-        })
-    )
-    setAppointments([...appointmentsTemp])
-  }, [day, todayAppointments])
+    todayAppointments?.forEach((appointment) => {
+      const isYourAppointment = appointment.oib === oib
+      appointmentsTemp[appointment.slot] = {
+        available: isYourAppointment ? Availability.YourAppointment : Availability.Unavailable,
+        slot: appointment.slot,
+      }
+    })
+
+    setAvailabilities([...appointmentsTemp])
+  }, [day, todayAppointments, oib])
 
   useEffect(() => {
     setTodayAppointments(appointmentsToday || [])
@@ -53,21 +59,28 @@ const CalendarDay = ({
     setNotificationText(text)
   }
 
-  const createAppointmentAtSlot = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const createAppointmentAtSlot = ({
+    text,
+    name,
+    oib,
+  }: {
+    text: string
+    name: string
+    oib: string
+  }) => {
     displayNotification('pending', 'Your appointments is being created!')
 
     //could use isOibValid method
 
     const appointment: Appointment = {
       slot: appointmentSlot!,
-      text: textRef.current!.value || '',
-      name: nameRef.current!.value || '',
-      oib: oibRef.current!.value || '',
+      text,
+      name,
+      oib,
       date: day.dateDisplay,
     }
 
-    const response = await createAppointment(appointment)
+    const response = createAppointment(appointment)
     if (response.errorMessage) {
       displayNotification('error', response.errorMessage)
     } else {
@@ -79,52 +92,50 @@ const CalendarDay = ({
     setDisplayModal(false)
   }
 
+  const openPreviewForm = () => {
+    const appointmentToPreviewTemp = todayAppointments.find(
+      (appointment) => appointment.oib === oib
+    )
+    setAppointmentToPreview(appointmentToPreviewTemp)
+    setDisplayPreviewModal(true)
+  }
+
   return (
     <>
-      {appointments.map((appointment) => (
+      {availabilities.map((availability) => (
         <CalendarBox
-          key={appointment.slot}
-          availability={appointment.available}
+          key={availability.slot}
+          availability={availability.available}
           onClick={
-            appointment.available === Availability.Available
-              ? () => openCreateForm(appointment.slot)
+            availability.available === Availability.Available && !maxAppointmentsReached
+              ? () => openCreateForm(availability.slot)
+              : availability.available === Availability.YourAppointment
+              ? () => openPreviewForm()
               : null
           }
         >
-          {Availability[appointment.available]}
+          {availability.available === Availability.YourAppointment ? (
+            <span>Your Appointment</span>
+          ) : (
+            Availability[availability.available]
+          )}
         </CalendarBox>
       ))}
-      <Modal
-        contentLabel='Ovo je modal'
-        isOpen={displayModal}
-        onRequestClose={() => setDisplayModal(false)}
-        className='modal'
-        ariaHideApp={false}
-      >
-        <form onSubmit={createAppointmentAtSlot}>
-          <div>
-            <label>Name:</label>
-            <input type='text' id='name' ref={nameRef} required />
-          </div>
-          <div>
-            <label htmlFor='oib'>Oib:</label>
-            <input type='text' id='oib' ref={oibRef} required />
-            <span>*Za provjera koliko je termina korisnik rezervirao je korišten OIB*</span>
-          </div>
-          <div>
-            <label htmlFor='description'>Description:</label>
-            <input type='text' id='description' ref={textRef} required />
-          </div>
-          <div className='flex justify-between'>
-            <button type='button' onClick={() => setDisplayModal(false)}>
-              Cancel
-            </button>
-            <button className='primary' type='submit'>
-              Submit
-            </button>
-          </div>
-        </form>
-      </Modal>
+      {displayModal && (
+        <CreateAppointmentModal
+          displayModal={displayModal}
+          onSubmit={createAppointmentAtSlot}
+          onClose={() => setDisplayModal(false)}
+          oib={oib}
+        />
+      )}
+      {displayPreviewModal && (
+        <PreviewAppointmentModal
+          displayModal={displayPreviewModal}
+          onClose={() => setDisplayPreviewModal(false)}
+          appointment={appointmentToPreview!}
+        />
+      )}
       {!!notificationType && (
         <Notification
           message={notificationText}

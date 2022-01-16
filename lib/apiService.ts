@@ -1,5 +1,4 @@
 import { AllAppointments, Appointment, AvailabilityType } from '@types'
-import { server } from '@config'
 import { Availability } from 'enums'
 import {
   createDay,
@@ -7,22 +6,31 @@ import {
   generateEmptyDay,
   generateSlotAndDate,
   generatePreciseTimestamp,
+  clearLocalStorage,
+  getLocalStorage,
+  setLocalStorage,
+  addToLocalStorage,
 } from '@utils/helper'
 import dayjs from 'dayjs'
 
-const clearAppointments = async () => {
-  await fetch(`${server}/api/appointments/clear`)
+const clearAppointments = () => {
+  clearLocalStorage('generatedAppointments')
 }
 
-const clearUserAppointments = async () => {
-  await fetch(`${server}/api/appointments/usersAppointments`, { method: 'DELETE' })
+const clearUserAppointments = (oib?: string) => {
+  if (oib) {
+    const userAppointments = getLocalStorage('userAppointments').filter(
+      (appointment: Appointment) => appointment.oib !== oib
+    )
+    setLocalStorage('userAppointments', userAppointments)
+  } else {
+    clearLocalStorage('userAppointments')
+  }
 }
 
-const generateAppointments = async () => {
-  await fetch(`${server}/api/appointments/clear`)
-
-  const uAResponse = await fetch(`${server}/api/appointments/usersAppointments`)
-  const { data: uAData } = await uAResponse.json()
+const generateAppointments = () => {
+  clearAppointments()
+  const uAData = getLocalStorage('userAppointments')
   const usersAppointments = uAData.map((userAppointment: Appointment) => {
     const timestamp = dayjs(userAppointment.timestamp).startOf('day').valueOf()
     return { ...userAppointment, timestamp }
@@ -79,21 +87,14 @@ const generateAppointments = async () => {
     }
   }
 
-  const response = await fetch(`${server}/api/appointments/generate`, {
-    method: 'POST',
-    body: JSON.stringify(appointments),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-
-  const data = await response.json()
-  return data
+  setLocalStorage('generatedAppointments', appointments)
+  return appointments
 }
 
-const getAllAppointments = async () => {
-  const response = await fetch(`${server}/api/appointments`)
-  const { data } = await response.json()
+const getAllAppointments = () => {
+  const generatedAppointments = getLocalStorage('generatedAppointments')
+  const usersAppointments = getLocalStorage('userAppointments')
+  const data = [...generatedAppointments, ...usersAppointments]
   const appointments: AllAppointments = {}
   data.forEach((appointment: Appointment) => {
     const { slot, date, timestamp } = generateSlotAndDate(appointment.timestamp!)
@@ -106,27 +107,51 @@ const getAllAppointments = async () => {
   return appointments
 }
 
-const createAppointment = async (appointment: Appointment) => {
-  const timestamp = generatePreciseTimestamp(appointment.date!, appointment.slot)
+const getUserAppointmentLength = (oib: string) => {
+  return getLocalStorage('userAppointments').filter(
+    (appointment: Appointment) => appointment.oib === oib
+  ).length
+}
 
+const createAppointment = (appointment: Appointment) => {
+  const timestamp = generatePreciseTimestamp(appointment.date!, appointment.slot)
+  const { oib, text, name, slot } = appointment
   const params = {
     timestamp,
-    oib: appointment.oib,
-    text: appointment.text,
-    name: appointment.name,
-    slot: appointment.slot,
+    oib,
+    text,
+    name,
+    slot,
   }
 
-  const response = await fetch(`${server}/api/appointments`, {
-    method: 'POST',
-    body: JSON.stringify(params),
-    headers: {
-      'Content-Type': 'appl ication/json',
-    },
-  })
-  const data = await response.json()
+  let response = { errorMessage: '', message: '' }
 
-  return data
+  if (!oib || !name || !text) {
+    response.errorMessage = 'Missing input'
+    return response
+  }
+
+  const data: Appointment[] = getLocalStorage('userAppointments')
+
+  const usersAppointments = data.filter((appointment) => appointment.oib === oib)
+
+  if (usersAppointments.length >= 2) {
+    response.errorMessage = 'You already have 2 appointments this week'
+    return response
+  } else if (
+    !!usersAppointments.find(
+      (appointment) =>
+        dayjs(appointment.timestamp).startOf('day').valueOf() ===
+        dayjs(timestamp).startOf('day').valueOf()
+    )
+  ) {
+    response.errorMessage = 'You already have 1 appointment on this day'
+    return response
+  } else {
+    addToLocalStorage('userAppointments', params)
+    response.message = 'Success'
+    return response
+  }
 }
 
 export {
@@ -135,4 +160,5 @@ export {
   generateAppointments,
   getAllAppointments,
   clearUserAppointments,
+  getUserAppointmentLength,
 }

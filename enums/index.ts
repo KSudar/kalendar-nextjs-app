@@ -16,7 +16,7 @@ enum WorkingShift {
 enum Availability {
   Unavailable,
   Available,
-  ReservedByUser,
+  YourAppointment,
   Break,
   Closed,
 }

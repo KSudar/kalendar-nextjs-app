@@ -115,6 +115,23 @@ const generateEmptyDay = (shift: WorkingShift) => {
   return dayAppoitmentsArray
 }
 
+const setLocalStorage = (name: string, value: any) => {
+  localStorage.setItem(name, JSON.stringify(value))
+}
+
+const clearLocalStorage = (name: string) => {
+  localStorage.setItem(name, JSON.stringify([]))
+}
+
+const getLocalStorage = (name: string) => {
+  return JSON.parse(localStorage.getItem(name) || '[]')
+}
+
+const addToLocalStorage = (name: string, value: any) => {
+  const currentValue = getLocalStorage(name)
+  setLocalStorage(name, [...currentValue, value])
+}
+
 export {
   generateEmptyDay,
   getWorkingShift,
@@ -124,4 +141,8 @@ export {
   generateSlotAndDate,
   createDay,
   isOibValid,
+  setLocalStorage,
+  clearLocalStorage,
+  getLocalStorage,
+  addToLocalStorage,
 }

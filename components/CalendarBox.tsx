@@ -17,7 +17,7 @@ const CalendarBox = ({
       setBackgroundColor(styles.available)
     } else if (availability === Availability.Unavailable) {
       setBackgroundColor(styles.unavailable)
-    } else if (availability === Availability.ReservedByUser) {
+    } else if (availability === Availability.YourAppointment) {
       setBackgroundColor(styles.reserved)
     } else if (availability === Availability.Break) {
       setBackgroundColor(styles.break)

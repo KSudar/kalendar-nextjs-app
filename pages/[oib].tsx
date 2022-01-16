@@ -8,40 +8,35 @@ import {
 import { AllAppointments } from '@types'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const Home = () => {
-  const [appointments, seAppointments] = useState<AllAppointments>({})
-  const oibRef = useRef<HTMLInputElement>(null)
+  const [appointments, setAppointments] = useState<AllAppointments>({})
   const router = useRouter()
+  const oib: string = router.query.oib as string
 
   const handleGenerate = () => {
     generateAppointments()
     const appointmentsTemp = getAllAppointments()
-    seAppointments({ ...appointmentsTemp })
+    setAppointments({ ...appointmentsTemp })
   }
 
   const handleClear = () => {
     clearAppointments()
     const appointmentsTemp = getAllAppointments()
-    seAppointments({ ...appointmentsTemp })
+    setAppointments({ ...appointmentsTemp })
   }
 
   const handleClearUsersAppointments = () => {
-    clearUserAppointments()
+    clearUserAppointments(oib)
     const appointmentsTemp = getAllAppointments()
-    seAppointments({ ...appointmentsTemp })
+    setAppointments({ ...appointmentsTemp })
   }
 
   useEffect(() => {
-    handleGenerate()
+    const appointmentsTemp = getAllAppointments()
+    setAppointments({ ...appointmentsTemp })
   }, [])
-
-  const goToUserCalendar = () => {
-    if (oibRef.current?.value) {
-      router.push(`/${oibRef.current.value}`)
-    }
-  }
 
   return (
     <div className='p-3'>
@@ -57,10 +52,10 @@ const Home = () => {
         <button onClick={handleClear}>Clear Appointments</button>
       </div>
       <div className='text-center'>
-        <button onClick={handleClearUsersAppointments}>{`Clear User's Appointments`}</button>
+        <button onClick={handleClearUsersAppointments}>{`Clear This User's Appointments`}</button>
       </div>
       <div>
-        <CalendarGrid allAppointments={appointments}></CalendarGrid>
+        <CalendarGrid allAppointments={appointments} oib={oib}></CalendarGrid>
       </div>
     </div>
   )

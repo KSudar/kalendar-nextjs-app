@@ -1,7 +1,9 @@
 import { Appointment } from '@types'
 import dayjs, { Dayjs } from 'dayjs'
-import { Availability, DaysOfTheWeek, HoursSlot, WorkingShift } from 'enums'
+import { Availability, HoursSlot, WorkingShift } from 'enums'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+require('dayjs/locale/hr')
+dayjs.locale('hr')
 
 const generatePreciseTimestamp = (date: string, slot: HoursSlot) => {
   dayjs.extend(customParseFormat)
@@ -86,7 +88,6 @@ const createDay = (dayOffset: number) => {
     dayIndex: day.day(),
     workingHours: getWorkingShift(day),
     dateDisplay: day.format('ddd DD.MM.YY.'),
-    dayDisplay: DaysOfTheWeek[day.day()],
   }
 }
 
@@ -95,19 +96,19 @@ const generateEmptyDay = (shift: WorkingShift) => {
   for (let i = 0; i < 22; i++) {
     let availability
     if (shift === WorkingShift.Closed) {
-      availability = Availability.Closed
+      availability = Availability.Zatvoreno
     } else if (shift === WorkingShift.Morning && i >= HoursSlot['14:00']) {
-      availability = Availability.Closed
+      availability = Availability.Zatvoreno
     } else if (shift === WorkingShift.Afternoon && i < HoursSlot['13:00']) {
-      availability = Availability.Closed
+      availability = Availability.Zatvoreno
     } else {
-      availability = Availability.Available
+      availability = Availability.Rezerviraj
     }
     if (
       (i === HoursSlot['11:00'] || i === HoursSlot['16:00']) &&
-      availability !== Availability.Closed
+      availability !== Availability.Zatvoreno
     ) {
-      availability = Availability.Break
+      availability = Availability.Pauza
     }
 
     dayAppoitmentsArray.push({ slot: i, available: availability })

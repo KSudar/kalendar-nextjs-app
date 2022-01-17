@@ -6,7 +6,6 @@ import {
   getAllAppointments,
 } from '@lib/apiService'
 import { AllAppointments } from '@types'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
@@ -44,25 +43,28 @@ const Home = () => {
   }
 
   return (
-    <div className='p-3'>
-      <Head>
-        <title>Calendar app</title>
-        <meta name='description' content='Weekly calendar app' />
-      </Head>
-      <h1>Kalendar App</h1>
-      <div className='text-center'>
-        <button onClick={handleGenerate}>Generate New Appointments</button>
+    <>
+      <div className='header content-padding'>
+        <h1>Kalendar Ordinacije</h1>
+        <div className='settings-menu'>
+          <button onClick={handleGenerate}>Generiraj termine</button>
+          <button onClick={handleClear}>Obriši generirane termine</button>
+          <button onClick={handleClearUsersAppointments}>Obriši korisničke termine</button>
+        </div>
       </div>
-      <div className='text-center'>
-        <button onClick={handleClear}>Clear Appointments</button>
+      <div className='content-padding oib-section'>
+        <div>
+          <label>
+            <strong>Unesi OIB</strong>
+          </label>
+          <input type='text' ref={oibRef} />
+          <button onClick={goToUserCalendar} className='button button-primary'>
+            Pogledaj rezervacije
+          </button>
+        </div>
       </div>
-      <div className='text-center'>
-        <button onClick={handleClearUsersAppointments}>{`Clear User's Appointments`}</button>
-      </div>
-      <div>
-        <CalendarGrid allAppointments={appointments}></CalendarGrid>
-      </div>
-    </div>
+      <CalendarGrid allAppointments={appointments}></CalendarGrid>
+    </>
   )
 }
 

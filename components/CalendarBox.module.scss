@@ -1,39 +1,40 @@
 .box {
-	border: 2px solid black;
-	height: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: solid 1px #e7e7e7;
 }
 
 .box:hover {
-	&.available {
-		@apply bg-green-300;
-		cursor: pointer;
-	}
-	&.reserved {
-		@apply bg-yellow-300;
-		cursor: pointer;
-	}
+  &.available {
+    background: #51c9a9;
+  }
+
+  &.reserved {
+    @apply bg-yellow-300;
+  }
 }
 
 .available {
-	@apply bg-green-400;
+  background: #9bdbca;
+  cursor: pointer;
 }
 
 .closed {
-	@apply bg-red-400;
+  background: #f7f7f7;
+  color: #ccc;
 }
 
 .unavailable {
-	@apply bg-gray-600;
+  background: #e9e9e9;
 }
 
 .reserved {
-	@apply bg-yellow-400;
+  @apply bg-yellow-400;
+  cursor: pointer;
 }
 
 .break {
-	@apply bg-orange-400;
-}
-
-.default {
-	@apply bg-slate-400;
+  background: #ffeed4;
 }

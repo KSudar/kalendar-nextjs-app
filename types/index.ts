@@ -15,7 +15,6 @@ type Day = {
   timestamp: number
   dayIndex: number
   dateDisplay: string
-  dayDisplay: string
   workingHours: WorkingShift
 }
 

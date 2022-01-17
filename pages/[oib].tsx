@@ -6,7 +6,7 @@ import {
   getAllAppointments,
 } from '@lib/apiService'
 import { AllAppointments } from '@types'
-import Head from 'next/head'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
@@ -39,24 +39,22 @@ const Home = () => {
   }, [])
 
   return (
-    <div className='p-3'>
-      <Head>
-        <title>Calendar app</title>
-        <meta name='description' content='Weekly calendar app' />
-      </Head>
-      <h1>Kalendar App</h1>
-      <div className='text-center'>
-        <button onClick={handleGenerate}>Generate New Appointments</button>
+    <div>
+      <div className='header content-padding'>
+        <h1>Kalendar Ordinacije</h1>
+        <div className='settings-menu'>
+          <button onClick={handleGenerate}>Generiraj termine</button>
+          <button onClick={handleClear}>Obriši generirane termine</button>
+          <button onClick={handleClearUsersAppointments}>Obriši termine ovog korisnika</button>
+        </div>
       </div>
-      <div className='text-center'>
-        <button onClick={handleClear}>Clear Appointments</button>
+      <div className='content-padding oib-section'>
+        <strong>Pregled rezervacija za OIB: {oib}</strong>{' '}
+        <Link href='/'>
+          <span className='button button-primary'>Rezerviraj termin za drugu osobu</span>
+        </Link>
       </div>
-      <div className='text-center'>
-        <button onClick={handleClearUsersAppointments}>{`Clear This User's Appointments`}</button>
-      </div>
-      <div>
-        <CalendarGrid allAppointments={appointments} oib={oib}></CalendarGrid>
-      </div>
+      <CalendarGrid allAppointments={appointments} oib={oib}></CalendarGrid>
     </div>
   )
 }

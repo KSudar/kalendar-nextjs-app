@@ -26,3 +26,32 @@
     padding: 0 24px;
   }
 }
+
+.modal {
+  > div {
+    margin-bottom: 8px;
+  }
+
+  label {
+    margin-right: 8px;
+    display: inline-block;
+    width: 120px;
+    text-align: right;
+  }
+}
+
+.modalHeader {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+
+  button {
+    margin-left: 8px;
+  }
+}

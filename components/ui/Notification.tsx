@@ -15,7 +15,7 @@ const Notification = ({
   const [displayNotification, setDisplayNotification] = useState(false)
 
   useEffect(() => {
-    setDisplayNotification(true)
+    if (status) setDisplayNotification(true)
     if (status !== 'pending') {
       const timer = setTimeout(() => {
         setDisplayNotification(false)
@@ -46,7 +46,6 @@ const Notification = ({
           }}
           className={cssClasses}
         >
-          <h2 className='capitalize'>{status}</h2>
           <p>{message}</p>
         </div>
       )}

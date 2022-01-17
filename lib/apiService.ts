@@ -17,9 +17,13 @@ const clearAppointments = () => {
   clearLocalStorage('generatedAppointments')
 }
 
+const getAllUserAppointments = () => {
+  return getLocalStorage('userAppointments')
+}
+
 const clearUserAppointments = (oib?: string) => {
   if (oib) {
-    const userAppointments = getLocalStorage('userAppointments').filter(
+    const userAppointments = getAllUserAppointments().filter(
       (appointment: Appointment) => appointment.oib !== oib
     )
     setLocalStorage('userAppointments', userAppointments)
@@ -30,8 +34,7 @@ const clearUserAppointments = (oib?: string) => {
 
 const generateAppointments = () => {
   clearAppointments()
-  const uAData = getLocalStorage('userAppointments')
-  const usersAppointments = uAData.map((userAppointment: Appointment) => {
+  const usersAppointments = getAllUserAppointments().map((userAppointment: Appointment) => {
     const timestamp = dayjs(userAppointment.timestamp).startOf('day').valueOf()
     return { ...userAppointment, timestamp }
   })
@@ -43,7 +46,7 @@ const generateAppointments = () => {
   for (let offset = 0; offset < 7; offset++) {
     const { timestamp, workingHours } = createDay(offset)
     const daySlots = generateEmptyDay(workingHours).filter((availability) => {
-      return availability.available === Availability.Available
+      return availability.available === Availability.Rezerviraj
     })
     if (!!daySlots.length) {
       possibleAppointments[timestamp] = daySlots
@@ -93,7 +96,7 @@ const generateAppointments = () => {
 
 const getAllAppointments = () => {
   const generatedAppointments = getLocalStorage('generatedAppointments')
-  const usersAppointments = getLocalStorage('userAppointments')
+  const usersAppointments = getAllUserAppointments()
   const data = [...generatedAppointments, ...usersAppointments]
   const appointments: AllAppointments = {}
   data.forEach((appointment: Appointment) => {
@@ -105,12 +108,6 @@ const getAllAppointments = () => {
     ]
   })
   return appointments
-}
-
-const getUserAppointmentLength = (oib: string) => {
-  return getLocalStorage('userAppointments').filter(
-    (appointment: Appointment) => appointment.oib === oib
-  ).length
 }
 
 const createAppointment = (appointment: Appointment) => {
@@ -136,7 +133,7 @@ const createAppointment = (appointment: Appointment) => {
   const usersAppointments = data.filter((appointment) => appointment.oib === oib)
 
   if (usersAppointments.length >= 2) {
-    response.errorMessage = 'You already have 2 appointments this week'
+    response.errorMessage = 'Nije moguće napraviti više od dvije rezervacije tjedno'
     return response
   } else if (
     !!usersAppointments.find(
@@ -145,11 +142,11 @@ const createAppointment = (appointment: Appointment) => {
         dayjs(timestamp).startOf('day').valueOf()
     )
   ) {
-    response.errorMessage = 'You already have 1 appointment on this day'
+    response.errorMessage = 'Nije dopušteno napraviti više od jedne rezervacije u danu'
     return response
   } else {
     addToLocalStorage('userAppointments', params)
-    response.message = 'Success'
+    response.message = 'Rezervacija uspješno napravljena'
     return response
   }
 }
@@ -160,5 +157,4 @@ export {
   generateAppointments,
   getAllAppointments,
   clearUserAppointments,
-  getUserAppointmentLength,
 }

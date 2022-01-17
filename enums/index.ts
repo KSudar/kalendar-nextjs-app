@@ -1,12 +1,3 @@
-enum DaysOfTheWeek {
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-}
 enum WorkingShift {
   Morning,
   Afternoon,
@@ -14,11 +5,11 @@ enum WorkingShift {
 }
 
 enum Availability {
-  Unavailable,
-  Available,
-  YourAppointment,
-  Break,
-  Closed,
+  Zauzeto,
+  Rezerviraj,
+  VasTermin,
+  Pauza,
+  Zatvoreno,
 }
 
 enum HoursSlot {
@@ -46,4 +37,4 @@ enum HoursSlot {
   '18:30',
   '19:00',
 }
-export { DaysOfTheWeek, WorkingShift, Availability, HoursSlot }
+export { WorkingShift, Availability, HoursSlot }

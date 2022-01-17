@@ -1,42 +1,87 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import 'variables.scss';
 
-h1 {
-  @apply text-4xl;
-  @apply text-center;
-  @apply my-8;
-  @apply uppercase;
+body {
+  color: $gray-primary;
 }
 
-button {
-  @apply bg-slate-400 hover:bg-slate-700 text-white font-bold py-1 px-4 rounded my-1;
+input {
+  border-bottom: solid 1px $gray-light;
+
+  &:focus-visible {
+    outline: none;
+  }
 }
-form {
-  @apply bg-white shadow-md rounded px-8 pt-6 pb-8 mb-0;
-  div {
-    @apply mb-4;
-    label {
-      @apply block text-gray-700 text-sm font-bold mb-2;
-    }
-    input {
-      @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none;
-    }
-    button.primary {
-      @apply border bg-green-400 hover:bg-green-700 rounded font-bold text-black;
-    }
-    button {
-      @apply bg-slate-400 hover:bg-slate-700 border text-black font-bold py-1 px-4 rounded my-1;
+
+.content-padding {
+  padding: $padding-base $padding-l;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: solid 1px $gray-light;
+  font-weight: 600;
+
+  h1 {
+    font-size: 24px;
+  }
+
+  button {
+    padding: $padding-s $padding-base;
+  }
+}
+
+.settings-menu {
+}
+
+.oib-section {
+  padding-top: $padding-l;
+  padding-bottom: $padding-l;
+  display: flex;
+  justify-content: space-between;
+
+  input {
+    margin: 0 $padding-m;
+
+    &:focus-visible {
+      outline: none;
     }
   }
 }
 
 .modal {
-  // height: 400px;
   width: 500px;
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   margin-bottom: 0;
+  background: white;
+  padding: $padding-m $padding-xl;
+  box-shadow: 0px 0px 28px $gray-light;
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.button {
+  text-transform: uppercase;
+  font-size: 13px;
+  padding: $padding-base $padding-m;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.button-primary {
+  background: $brand;
+  color: white;
+}
+
+.button-secondary {
+  border: solid 1px $gray-light;
 }

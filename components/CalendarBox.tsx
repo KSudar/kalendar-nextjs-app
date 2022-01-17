@@ -13,15 +13,15 @@ const CalendarBox = ({
   const [backgroundColor, setBackgroundColor] = useState<string>()
 
   useEffect(() => {
-    if (availability === Availability.Available) {
+    if (availability === Availability.Rezerviraj) {
       setBackgroundColor(styles.available)
-    } else if (availability === Availability.Unavailable) {
+    } else if (availability === Availability.Zauzeto) {
       setBackgroundColor(styles.unavailable)
-    } else if (availability === Availability.YourAppointment) {
+    } else if (availability === Availability.VasTermin) {
       setBackgroundColor(styles.reserved)
-    } else if (availability === Availability.Break) {
+    } else if (availability === Availability.Pauza) {
       setBackgroundColor(styles.break)
-    } else if (availability === Availability.Closed) {
+    } else if (availability === Availability.Zatvoreno) {
       setBackgroundColor(styles.closed)
     } else {
       setBackgroundColor(styles.default)
@@ -35,7 +35,7 @@ const CalendarBox = ({
   }
 
   return (
-    <div className={`${styles.box} ${backgroundColor} shadow-xl`} onClick={handleClick}>
+    <div className={`${styles.box} ${backgroundColor}`} onClick={handleClick}>
       {children}
     </div>
   )

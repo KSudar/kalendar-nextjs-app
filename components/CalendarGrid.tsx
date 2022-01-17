@@ -1,10 +1,9 @@
 import CalendarDay from '@components/CalendarDay'
 import WorkingHours from '@components/WorkingHours'
 import { useEffect, useState } from 'react'
-import { AllAppointments, Appointment, Day } from '@types'
+import { AllAppointments, Day } from '@types'
 import styles from './CalendarGrid.module.scss'
 import { createDay } from '@utils/helper'
-import { getUserAppointmentLength } from '@lib/apiService'
 
 const CalendarGrid = ({
   allAppointments,
@@ -15,13 +14,9 @@ const CalendarGrid = ({
 }) => {
   const [appointments, setAppointments] = useState<AllAppointments>(allAppointments)
   const [thisWeek, setThisWeek] = useState<Day[]>([])
-  const [userAppointmentsCount, setUserAppointmentsCount] = useState(0)
 
   useEffect(() => {
     setAppointments({ ...allAppointments })
-    if (oib) {
-      setUserAppointmentsCount(getUserAppointmentLength(oib))
-    }
   }, [allAppointments, oib])
 
   useEffect(() => {
@@ -33,10 +28,10 @@ const CalendarGrid = ({
   }, [])
 
   return (
-    <div className='flex text-center justify-center'>
+    <div className={`${styles.calendarGrid} flex text-center justify-center`}>
       <div>
-        <div className={`${styles.header}`}>Hours:</div>
-        <div>
+        <div className={styles.header}>Termini:</div>
+        <div className={styles.calendarHours}>
           <WorkingHours />
         </div>
       </div>
@@ -46,12 +41,7 @@ const CalendarGrid = ({
             <div>{day.dateDisplay}</div>
           </div>
           <div>
-            <CalendarDay
-              appointmentsToday={appointments[day.timestamp]}
-              day={day}
-              oib={oib}
-              userAppointmentsCount={userAppointmentsCount}
-            />
+            <CalendarDay appointmentsToday={appointments[day.timestamp]} day={day} oib={oib} />
           </div>
         </div>
       ))}

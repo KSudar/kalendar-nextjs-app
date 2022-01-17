@@ -1,32 +1,27 @@
 import { Appointment, AvailabilityType, Day } from '@types'
-import { generateEmptyDay } from '@utils/helper'
-import { Availability } from 'enums'
-import React, { useEffect, useRef, useState } from 'react'
+import { generateEmptyDay, isOibValid } from '@utils/helper'
+import { Availability, HoursSlot } from 'enums'
+import React, { useEffect, useState } from 'react'
 import CalendarBox from '@components/CalendarBox'
 import { createAppointment } from '@lib/apiService'
 import Notification from '@components/ui/Notification'
-import CreateAppointmentModal from '@components/CreateAppointmentModal'
-import PreviewAppointmentModal from '@components/PreviewAppointmentModal'
+import CreateOrPreviewAppointmentModal from '@components/CreateOrPreviewAppointmentModal'
 
 const CalendarDay = ({
   appointmentsToday,
   day,
   oib,
-  userAppointmentsCount,
 }: {
   appointmentsToday?: Appointment[]
   day: Day
   oib?: string
-  userAppointmentsCount?: number
 }) => {
   const [availabilities, setAvailabilities] = useState<AvailabilityType[]>(
     generateEmptyDay(day.workingHours)
   )
 
-  const maxAppointmentsReached = !!userAppointmentsCount && userAppointmentsCount >= 2
-
   const [todayAppointments, setTodayAppointments] = useState<Appointment[]>(appointmentsToday || [])
-  const [displayModal, setDisplayModal] = useState(false)
+  const [displayCreateModal, setDisplayCreateModal] = useState(false)
   const [displayPreviewModal, setDisplayPreviewModal] = useState(false)
   const [notificationType, setNotificationType] = useState('')
   const [notificationText, setNotificationText] = useState('')
@@ -37,7 +32,7 @@ const CalendarDay = ({
     todayAppointments?.forEach((appointment) => {
       const isYourAppointment = appointment.oib === oib
       appointmentsTemp[appointment.slot] = {
-        available: isYourAppointment ? Availability.YourAppointment : Availability.Unavailable,
+        available: isYourAppointment ? Availability.VasTermin : Availability.Zauzeto,
         slot: appointment.slot,
       }
     })
@@ -50,7 +45,7 @@ const CalendarDay = ({
   }, [appointmentsToday])
 
   const openCreateForm = (slot: number) => {
-    setDisplayModal(true)
+    setDisplayCreateModal(true)
     setAppointmentSlot(slot)
   }
 
@@ -72,6 +67,14 @@ const CalendarDay = ({
 
     //could use isOibValid method
 
+    const isOib = isOibValid(oib)
+
+    if (!isOib) {
+      displayNotification('error', 'Please enter valid OIB.')
+
+      return
+    }
+
     const appointment: Appointment = {
       slot: appointmentSlot!,
       text,
@@ -89,7 +92,7 @@ const CalendarDay = ({
       appointmentsTemp.push(appointment)
       setTodayAppointments(appointmentsTemp)
     }
-    setDisplayModal(false)
+    setDisplayCreateModal(false)
   }
 
   const openPreviewForm = () => {
@@ -107,32 +110,34 @@ const CalendarDay = ({
           key={availability.slot}
           availability={availability.available}
           onClick={
-            availability.available === Availability.Available && !maxAppointmentsReached
+            availability.available === Availability.Rezerviraj
               ? () => openCreateForm(availability.slot)
-              : availability.available === Availability.YourAppointment
+              : availability.available === Availability.VasTermin
               ? () => openPreviewForm()
               : null
           }
         >
-          {availability.available === Availability.YourAppointment ? (
-            <span>Your Appointment</span>
+          {availability.available === Availability.VasTermin ? (
+            <span>Tvoja rezervacija</span>
           ) : (
             Availability[availability.available]
           )}
         </CalendarBox>
       ))}
-      {displayModal && (
-        <CreateAppointmentModal
-          displayModal={displayModal}
+      {displayCreateModal && (
+        <CreateOrPreviewAppointmentModal
+          displayModal={displayCreateModal}
           onSubmit={createAppointmentAtSlot}
-          onClose={() => setDisplayModal(false)}
+          onClose={() => setDisplayCreateModal(false)}
           oib={oib}
+          date={`${day.dateDisplay} ${HoursSlot[appointmentSlot!]} `}
         />
       )}
       {displayPreviewModal && (
-        <PreviewAppointmentModal
+        <CreateOrPreviewAppointmentModal
           displayModal={displayPreviewModal}
           onClose={() => setDisplayPreviewModal(false)}
+          oib={oib}
           appointment={appointmentToPreview!}
         />
       )}
